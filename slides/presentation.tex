@@ -1,0 +1,140 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+\definecolor{navy}{HTML}{142D4E}
+\definecolor{teal}{HTML}{087F8C}
+\definecolor{pale}{HTML}{EAF6F6}
+\setbeamercolor{structure}{fg=teal}
+\setbeamercolor{frametitle}{fg=white,bg=navy}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{titlelike}{fg=white,bg=navy}
+\setbeamercolor{block title}{fg=white,bg=teal}
+\setbeamercolor{block body}{fg=black,bg=pale}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{pale},frame=single,rulecolor=\color{teal},columns=fullflexible,keepspaces=true,showstringspaces=false}
+\title{Applications of Bitwise Operators}
+\subtitle{IPv4 Addresses, Subnet Masks, and Networks}
+\author{COMP 211 --- Systems Programming}
+\date{}
+\begin{document}
+
+\begin{frame}
+\titlepage
+\begin{center}\large How does a computer figure out which network an IP address belongs to?\end{center}
+\end{frame}
+
+\begin{frame}{Networks, Hosts, and IP Addresses}
+\begin{block}{Think of a neighborhood}
+\begin{itemize}
+\item \textbf{Network:} a group of devices that can communicate.
+\item \textbf{Host:} a device or interface on that network.
+\item \textbf{IP address:} a numerical address used to deliver data.
+\end{itemize}
+\end{block}
+\vspace{0.4cm}
+\begin{center}
+\Large \texttt{192.168.1.10}\par\medskip
+\normalsize Neighborhood = network \quad $\vert$ \quad House = host
+\end{center}
+\end{frame}
+
+\begin{frame}{IPv4 and Subnet Masks}
+\begin{itemize}
+\item An IPv4 address contains \textbf{32 bits}: four groups of 8 bits.
+\item The \textbf{subnet mask} says which bits identify the network.
+\item In \texttt{192.168.1.10/24}, the first 24 bits are network bits.
+\end{itemize}
+\vspace{0.3cm}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}\hline
+\cellcolor{pale}192 & \cellcolor{pale}168 & \cellcolor{pale}1 & 10\\\hline
+\multicolumn{3}{|c|}{\textbf{24 network bits}} & \textbf{8 host bits}\\\hline
+\end{tabular}
+\end{center}
+\vspace{0.35cm}
+\begin{block}{Subnet mask}\centering\texttt{255.255.255.0} \quad = \quad \texttt{/24}\end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Bitwise AND Finds the Network}
+\begin{block}{Rule}
+\centering \textbf{Network address = IP address \texttt{\&} subnet mask}
+\end{block}
+\begin{lstlisting}
+IP:       192.168.1.10
+Mask:     255.255.255.0
+Result:   192.168.1.0
+
+Last octet:
+  00001010   (10)
+& 00000000   (0)
+----------
+  00000000   (0)
+\end{lstlisting}
+\centering \textbf{AND keeps network bits and clears host bits.}
+\end{frame}
+
+\begin{frame}{Subnetting: Splitting a Network}
+\begin{itemize}
+\item Start with \texttt{192.168.1.0/24}: \textbf{256 total addresses}.
+\item Borrow \textbf{one host bit} to change \texttt{/24} into \texttt{/25}.
+\item Now we have \textbf{two subnets}, each with 128 addresses.
+\end{itemize}
+\vspace{0.35cm}
+\begin{block}{Two /25 subnets}
+\textbf{Subnet A:} \texttt{192.168.1.0 -- 192.168.1.127}\\[6pt]
+\textbf{Subnet B:} \texttt{192.168.1.128 -- 192.168.1.255}
+\end{block}
+\vspace{0.25cm}
+\centering Last octet starts with \texttt{0xxxxxxx} or \texttt{1xxxxxxx}.
+\end{frame}
+
+\begin{frame}[fragile]{Broadcast Addresses: All Host Bits Are 1}
+\begin{itemize}
+\item \textbf{Network address:} all host bits are \texttt{0}.
+\item \textbf{Broadcast address:} all host bits are \texttt{1}.
+\end{itemize}
+\begin{lstlisting}
+Network:         192.168.1.0
+Last usable:     192.168.1.254
+Broadcast:       192.168.1.255
+\end{lstlisting}
+\begin{block}{Using OR and NOT in C}
+\centering \texttt{broadcast = ip | \~{}subnet\_mask;}
+\end{block}
+\small For ordinary IPv4 subnets, the broadcast address is not assigned to an individual host.
+\end{frame}
+
+\begin{frame}{Audience Question}
+\Large Are these computers on the same \texttt{/24} subnet?\par\vspace{0.45cm}
+\begin{center}
+\Large \textbf{A:} \texttt{192.168.1.10}\\[0.3cm]
+\Large \textbf{B:} \texttt{192.168.1.50}
+\end{center}
+\vspace{0.5cm}
+\pause
+\begin{block}{Answer: Yes!}
+Both addresses ANDed with \texttt{255.255.255.0} produce \texttt{192.168.1.0}.
+\end{block}
+\end{frame}
+
+\begin{frame}{Key Takeaways}
+\begin{itemize}
+\setlength{\itemsep}{0.55em}
+\item An IPv4 address contains \textbf{network and host bits}.
+\item A \textbf{subnet mask} tells us how those bits are divided.
+\item \textbf{AND} calculates the network address.
+\item \textbf{Subnetting} creates smaller networks by borrowing host bits.
+\item \textbf{OR and NOT} help calculate the broadcast address.
+\end{itemize}
+\vspace{0.35cm}
+\begin{block}{Connection to COMP 211}
+Simple binary operations help computers make real networking decisions.
+\end{block}
+\end{frame}
+\end{document}
